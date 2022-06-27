@@ -1,0 +1,100 @@
+* {
+    color: white;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+
+button {
+    border-radius: 0;
+    border: 1px solid rgb(0, 0, 0);
+    font-size: 2rem;
+}
+
+
+.calculator {
+    width: 450px;
+    height: 600px;
+    border: 5px solid rgb(0, 0, 0);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.screen {
+    height: 150px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 0 25px;
+    background-color: rgb(69, 70, 71);
+}
+
+.result {
+    font-size: 5rem;
+}
+
+.buttons {
+    flex: 1;
+    display: flex;
+    border-top: 4px solid rgb(0, 0, 0);
+}
+
+.menu, 
+.num, 
+.func, 
+.num div {
+    display: flex;
+}
+
+.menu {
+    flex-basis: 75%;
+    flex-direction: column;
+}
+
+.func{
+    flex-basis: 20%;
+}
+
+.num {
+    flex-direction: column;
+    flex-basis: 80%;
+}
+
+
+.func button,
+.num div,
+.num button {
+    flex: 1;
+}
+
+.num div:last-of-type button:first-child {
+    flex: 0 1 66.6%;
+}
+
+.func button {
+    background-color: rgb(87, 88, 89);
+}
+
+.num button {
+    background-color: rgb(115, 116, 116); 
+}
+
+
+.operator {
+    display: flex;
+    flex-basis: 25%;
+    flex-direction: column;
+}
+
+.operator button {
+    background-color: rgb(255, 158, 11);
+    flex: 1;
+}
+
