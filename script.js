@@ -102,6 +102,7 @@ function changeButtonBGC(e) {
 }
 
 function getButtons() {
+    const menuButtons = [...document.querySelectorAll('.menu button')];
     const numButtons = [...document.querySelectorAll('.num button')];
     const operatorButtons = [...document.querySelectorAll('.operator button')];
 
@@ -111,6 +112,10 @@ function getButtons() {
 
     for (let button of operatorButtons) {
         button.addEventListener('click', operate);
+    }
+
+    for (let button of [...menuButtons, ...operatorButtons]) {
+        ['mousedown', 'mouseup'].forEach(event => button.addEventListener(event, changeButtonBGC))
     }
 }
 
