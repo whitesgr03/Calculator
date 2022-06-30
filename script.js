@@ -1,50 +1,70 @@
-// function calcMethods(str) {
-//     const methods = {
-//         "-": (a, b) => a - b,
-//         "+": (a, b) => a + b,
-//         "x": (a, b) => a * b,
-//         "÷": (a, b) => a / b,
-//     }
-    
-//     let split = str.split(' ');
-//     let a = +split[0];
-//     let op = split[1];
-//     let b = +split[2];
+function calc() {
+    const display = document.querySelector('.result');
 
-//     return methods[op](a, b);
-// }
+    let a = '';
+    let op = '';
+    let b = '';
 
-function operate(op, a, b) {
-    const fisrtNumber = document.querySelector('.result').textContent
-    
+    const methods = {
+        "-": (a, b) => a - b,
+        "+": (a, b) => a + b,
+        "x": (a, b) => a * b,
+        "÷": (a, b) => a / b,
+    }
+
+    // 在家簡塵除裡面寫if
+
+    function calculate() {
+        const result = methods[op](+a, +b)
+        a = result;
+        display.textContent = result;
+        return;
+    }
+
+    calculate.setNumber =  (n) => {
+        if (op) {
+            b += n
+            display.textContent = b;
+            return;
+        }
+
+        a += n
+        display.textContent = a
+    }
+
+    calculate.setOperator = (item) => {
+        op = item;
+    }
+
+    calculate.reset = () => {
+        display.textContent = '0';
+        a = '';
+        op = '';
+        b = '';
+    }
+
+    return calculate
+}
+
+function operate() {
     const isOperatorActive = document.querySelector('.active');
 
     if (isOperatorActive) {
         isOperatorActive.classList.remove('active')
     }
+
     if (this.textContent !== '=') {
-        this.classList.add('active'); 
+        this.classList.add('active');
+        calculator.setOperator(this.textContent);
+        return
     }
-    
 
-    // const methods = {
-    //     "-": (a, b) => a - b,
-    //     "+": (a, b) => a + b,
-    //     "x": (a, b) => a * b,
-    //     "÷": (a, b) => a / b,
-    // }
-
-    // return methods[op](a, b);
+    calculator();
 }
 
 function getNumber() {
-    const display = document.querySelector('.result');
 
-    if (display.textContent === '0') {
-        display.textContent = this.textContent
-    } else {
-        display.textContent += this.textContent;
-    }
+    const display = document.querySelector('.result');
 
     const [paddingRight, paddingLeft] = [
         parseInt(window.getComputedStyle(display.parentNode)['padding-right']),
@@ -58,7 +78,7 @@ function getNumber() {
         const currentFontSize = parseInt(window.getComputedStyle(display)['font-size']);
 
         if (currentFontSize === 16) {
-            display.textContent = 0;
+            calculator.reset();
             display.style['font-size'] = '80px';
             return 
         }
@@ -132,7 +152,10 @@ function getButtons() {
     const operatorButtons = [...document.querySelectorAll('.operator button')];
 
     for (let button of numButtons) {
-        button.addEventListener('click', getNumber);
+        button.addEventListener('click', function () {
+            calculator.setNumber(this.textContent)
+            getNumber()
+        });
     }
 
     for (let button of operatorButtons) {
@@ -143,5 +166,7 @@ function getButtons() {
         ['mousedown', 'mouseup'].forEach(event => button.addEventListener(event, changeButtonBGC))
     }
 }
+
+const calculator = calc();
 
 getButtons();
