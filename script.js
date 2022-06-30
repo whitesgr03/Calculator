@@ -38,8 +38,33 @@ function operate(op, a, b) {
 }
 
 function getNumber() {
-    const display = document.querySelector('.result')
-    display.textContent = this.textContent;
+    const display = document.querySelector('.result');
+
+    if (display.textContent === '0') {
+        display.textContent = this.textContent
+    } else {
+        display.textContent += this.textContent;
+    }
+
+    const [paddingRight, paddingLeft] = [
+        parseInt(window.getComputedStyle(display.parentNode)['padding-right']),
+        parseInt(window.getComputedStyle(display.parentNode)['padding-left'])
+    ];
+
+    // 數字是否超過父元素寬度
+    const isOverWidth = display.offsetWidth >= display.parentNode.offsetWidth - (paddingRight + paddingLeft)
+
+    if (isOverWidth) {
+        const currentFontSize = parseInt(window.getComputedStyle(display)['font-size']);
+
+        if (currentFontSize === 16) {
+            display.textContent = 0;
+            display.style['font-size'] = '80px';
+            return 
+        }
+        
+        display.style['font-size'] = `${currentFontSize - 16}px`;
+    }
 }
 
 function rgbToHsl(rgb){
