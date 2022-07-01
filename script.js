@@ -12,28 +12,43 @@ function calc() {
         "÷": (a, b) => a / b,
     }
 
-    // 在家簡塵除裡面寫if
-
     function calculate() {
         const result = methods[op](+a, +b)
         a = result;
         display.textContent = result;
+        checkScreenWidth();
         return;
     }
 
-    calculate.setNumber =  (n) => {
+    calculate.setNumber = (n) => {
         if (op) {
             b += n
             display.textContent = b;
-            return;
+            return 
         }
-
         a += n
-        display.textContent = a
+        display.textContent = a;
     }
 
     calculate.setOperator = (item) => {
-        op = item;
+        if (op) {
+            calculate();
+            b = ''
+        };
+        op = item
+    }
+
+    calculate.addDecimal = () => {
+        if (op && !b.includes('.')) {
+            b += '.'
+            display.textContent = b;
+            return 
+        } 
+        if (!a.includes('.')) {
+            a += '.'
+            display.textContent = a;
+            return 
+        } 
     }
 
     calculate.reset = () => {
@@ -41,6 +56,7 @@ function calc() {
         a = '';
         op = '';
         b = '';
+        temp = '';
     }
 
     return calculate
@@ -63,9 +79,11 @@ function operate() {
 }
 
 function getNumber(num) {
-
     calculator.setNumber(num)
+    checkScreenWidth();
+}
 
+function checkScreenWidth() {
     const display = document.querySelector('.result');
 
     const [paddingRight, paddingLeft] = [
@@ -96,6 +114,9 @@ function getFunc(key) {
             operatorActive.classList.remove('active');
         }
         calculator.reset();
+    }
+    if (key === '.') { 
+        calculator.addDecimal()
     }
 }
 
@@ -160,9 +181,7 @@ function changeButtonBGC(e) {
 
 function getButtons() {
     const menuButtons = [...document.querySelectorAll('.menu button')];
-    // const numButtons = [...document.querySelectorAll('.num button')];
     const operatorButtons = [...document.querySelectorAll('.operator button')];
-    // const funcButtons = [...document.querySelectorAll('.func button')]
 
     for (let button of menuButtons) {
         button.addEventListener('click', function () {
@@ -182,8 +201,3 @@ function getButtons() {
 const calculator = calc();
 
 getButtons();
-
-
-// operate 是關於點擊運算符觸發計算的函式
-// getNumber 是關於數字超過計算機螢幕寬度時縮小字體
-// 依照題目的邏輯撰寫 calc, 看看是不是要把 "加減乘除" 全部拆出去做個別的邏輯運算
