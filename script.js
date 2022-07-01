@@ -53,10 +53,10 @@ function calc() {
 
     calculate.reset = () => {
         display.textContent = '0';
+        display.style['font-size'] = '80px';
         a = '';
         op = '';
         b = '';
-        temp = '';
     }
 
     return calculate
