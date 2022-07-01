@@ -62,7 +62,9 @@ function operate() {
     calculator();
 }
 
-function getNumber() {
+function getNumber(num) {
+
+    calculator.setNumber(num)
 
     const display = document.querySelector('.result');
 
@@ -84,6 +86,16 @@ function getNumber() {
         }
         
         display.style['font-size'] = `${currentFontSize - 16}px`;
+    }
+}
+
+function getFunc(key) {
+    if (key === 'AC') {
+        const operatorActive = document.querySelector('.active');
+        if (operatorActive) {
+            operatorActive.classList.remove('active');
+        }
+        calculator.reset();
     }
 }
 
@@ -148,13 +160,13 @@ function changeButtonBGC(e) {
 
 function getButtons() {
     const menuButtons = [...document.querySelectorAll('.menu button')];
-    const numButtons = [...document.querySelectorAll('.num button')];
+    // const numButtons = [...document.querySelectorAll('.num button')];
     const operatorButtons = [...document.querySelectorAll('.operator button')];
+    // const funcButtons = [...document.querySelectorAll('.func button')]
 
-    for (let button of numButtons) {
+    for (let button of menuButtons) {
         button.addEventListener('click', function () {
-            calculator.setNumber(this.textContent)
-            getNumber()
+            isFinite(this.textContent) ? getNumber(+this.textContent) : getFunc(this.textContent)
         });
     }
 
@@ -170,3 +182,8 @@ function getButtons() {
 const calculator = calc();
 
 getButtons();
+
+
+// operate 是關於點擊運算符觸發計算的函式
+// getNumber 是關於數字超過計算機螢幕寬度時縮小字體
+// 依照題目的邏輯撰寫 calc, 看看是不是要把 "加減乘除" 全部拆出去做個別的邏輯運算
