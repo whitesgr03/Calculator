@@ -1,9 +1,9 @@
 function calc() {
     const display = document.querySelector('.result');
 
-    let a = '';
+    let a = 0;
     let op = '';
-    let b = '';
+    let b = 0;
 
     const methods = {
         "-": (a, b) => a - b,
@@ -13,8 +13,20 @@ function calc() {
     }
 
     function calculate() {
-        const result = methods[op](+a, +b)
-        a = result;
+        if (b === '') {
+            return;
+        }
+
+        let result = null;
+
+        if (op === "÷" && b === '0') {
+            result = '不是數字'
+        } else {
+            result = methods[op](+a, +b)
+            a = result;
+            b = '';
+        }
+        
         display.textContent = result;
         checkScreenWidth();
         return;
@@ -24,6 +36,7 @@ function calc() {
         if (op) {
             b += n
             display.textContent = b;
+            console.log(a, op, b)
             return 
         }
         a += n
@@ -33,23 +46,27 @@ function calc() {
     calculate.setOperator = (item) => {
         if (op) {
             calculate();
-            b = ''
         };
         op = item
+        console.log(a, op, b)
     }
 
-    calculate.addDecimal = () => {
-        if (op && !b.includes('.')) {
-            b += '.'
-            display.textContent = b;
-            return 
-        } 
-        if (!a.includes('.')) {
-            a += '.'
-            display.textContent = a;
-            return 
-        } 
-    }
+    // calculate.addDecimal = () => {
+    //     if (a === '' && b === '') {
+    //         return;
+    //     }
+
+    //     if (op && !b.includes('.')) {
+    //         b += '.'
+    //         display.textContent = b;
+    //         return 
+    //     } 
+    //     if (!a.includes('.')) {
+    //         a += '.'
+    //         display.textContent = a;
+    //         return 
+    //     } 
+    // }
 
     calculate.reset = () => {
         display.textContent = '0';
@@ -58,11 +75,11 @@ function calc() {
         op = '';
         b = '';
     }
-
+    
     return calculate
 }
 
-function operate() {
+function getOperate() {
     const isOperatorActive = document.querySelector('.active');
 
     if (isOperatorActive) {
@@ -70,16 +87,15 @@ function operate() {
     }
 
     if (this.textContent !== '=') {
-        this.classList.add('active');
         calculator.setOperator(this.textContent);
+        this.classList.add('active');
         return
     }
-
     calculator();
 }
 
 function getNumber(num) {
-    calculator.setNumber(num)
+    calculator.setNumber(num);
     checkScreenWidth();
 }
 
@@ -93,25 +109,26 @@ function checkScreenWidth() {
 
     // 數字是否超過父元素寬度
     const isOverWidth = display.offsetWidth >= display.parentNode.offsetWidth - (paddingRight + paddingLeft)
-
+    const fontSize = 16
     if (isOverWidth) {
         const currentFontSize = parseInt(window.getComputedStyle(display)['font-size']);
 
-        if (currentFontSize === 16) {
-            calculator.reset();
-            display.style['font-size'] = '80px';
+        if (currentFontSize === fontSize) {
+            // reset
+            display.style['font-size'] = `${ fontSize * 5 }px`;
             return 
         }
+
+        display.style['font-size'] = `${currentFontSize - fontSize}px`
         
-        display.style['font-size'] = `${currentFontSize - 16}px`;
     }
 }
 
 function getFunc(key) {
     if (key === 'AC') {
-        const operatorActive = document.querySelector('.active');
-        if (operatorActive) {
-            operatorActive.classList.remove('active');
+        const isOperatorActive = document.querySelector('.active');
+        if (isOperatorActive) {
+            isOperatorActive.classList.remove('active');
         }
         calculator.reset();
     }
@@ -190,7 +207,7 @@ function getButtons() {
     }
 
     for (let button of operatorButtons) {
-        button.addEventListener('click', operate);
+        button.addEventListener('click', getOperate);
     }
 
     for (let button of [...menuButtons, ...operatorButtons]) {
