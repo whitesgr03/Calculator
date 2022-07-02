@@ -24,8 +24,8 @@ function calc() {
         } else {
             result = methods[op](+a, +b)
             a = result;
-            b = '';
         }
+        b = '';
         
         display.textContent = result;
         checkScreenWidth();
