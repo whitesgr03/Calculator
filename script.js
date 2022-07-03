@@ -1,140 +1,38 @@
-function calc() {
-    const display = document.querySelector('.result');
-
-    let a = 0;
-    let op = '';
-    let b = 0;
-
-    const methods = {
-        "-": (a, b) => a - b,
-        "+": (a, b) => a + b,
-        "x": (a, b) => a * b,
-        "÷": (a, b) => a / b,
-    }
-
-    function calculate() {
-        if (b === '') {
-            return;
-        }
-
-        let result = null;
-
-        if (op === "÷" && b === '0') {
-            result = '不是數字'
-        } else {
-            result = methods[op](+a, +b)
-            a = result;
-        }
-        b = '';
-        
-        display.textContent = result;
-        checkScreenWidth();
-        return;
-    }
-
-    calculate.setNumber = (n) => {
-        if (op) {
-            b += n
-            display.textContent = b;
-            console.log(a, op, b)
-            return 
-        }
-        a += n
-        display.textContent = a;
-    }
-
-    calculate.setOperator = (item) => {
-        if (op) {
-            calculate();
-        };
-        op = item
-        console.log(a, op, b)
-    }
-
-    // calculate.addDecimal = () => {
-    //     if (a === '' && b === '') {
-    //         return;
-    //     }
-
-    //     if (op && !b.includes('.')) {
-    //         b += '.'
-    //         display.textContent = b;
-    //         return 
-    //     } 
-    //     if (!a.includes('.')) {
-    //         a += '.'
-    //         display.textContent = a;
-    //         return 
-    //     } 
-    // }
-
-    calculate.reset = () => {
-        display.textContent = '0';
-        display.style['font-size'] = '80px';
-        a = '';
-        op = '';
-        b = '';
-    }
-    
-    return calculate
-}
-
-function getOperate() {
-    const isOperatorActive = document.querySelector('.active');
-
-    if (isOperatorActive) {
-        isOperatorActive.classList.remove('active')
-    }
-
-    if (this.textContent !== '=') {
-        calculator.setOperator(this.textContent);
-        this.classList.add('active');
-        return
-    }
-    calculator();
-}
-
-function getNumber(num) {
-    calculator.setNumber(num);
-    checkScreenWidth();
-}
-
 function checkScreenWidth() {
     const display = document.querySelector('.result');
-
-    const [paddingRight, paddingLeft] = [
-        parseInt(window.getComputedStyle(display.parentNode)['padding-right']),
-        parseInt(window.getComputedStyle(display.parentNode)['padding-left'])
+    const screen = document.querySelector('.screen');
+    const [paddingRight, paddingLeft] = [ // screen padding
+        parseInt(window.getComputedStyle(screen)['padding-right']),
+        parseInt(window.getComputedStyle(screen)['padding-left'])
     ];
+    const fontSize = 16
+
+    display.style['opacity'] = 0;
+    display.style['font-size'] = `${ fontSize * 5 }px`;
 
     // 數字是否超過父元素寬度
-    const isOverWidth = display.offsetWidth >= display.parentNode.offsetWidth - (paddingRight + paddingLeft)
-    const fontSize = 16
-    if (isOverWidth) {
+    let isOverWidth = display.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)
+    
+    while (isOverWidth) {
         const currentFontSize = parseInt(window.getComputedStyle(display)['font-size']);
 
-        if (currentFontSize === fontSize) {
-            // reset
-            display.style['font-size'] = `${ fontSize * 5 }px`;
-            return 
+        if (currentFontSize === fontSize) { 
+            calculator.reset();
+            alert('The number is too large, the calculator will reset!')
+        } else {
+            display.style['font-size'] = `${currentFontSize - fontSize}px`
         }
 
-        display.style['font-size'] = `${currentFontSize - fontSize}px`
-        
+        isOverWidth = display.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)
     }
+    display.style['opacity'] = 1;
 }
 
-function getFunc(key) {
-    if (key === 'AC') {
+function checkOperatorActive() {
         const isOperatorActive = document.querySelector('.active');
         if (isOperatorActive) {
             isOperatorActive.classList.remove('active');
         }
-        calculator.reset();
-    }
-    if (key === '.') { 
-        calculator.addDecimal()
-    }
 }
 
 function rgbToHsl(rgb){
@@ -175,6 +73,40 @@ function rgbToHsl(rgb){
     return [h, s, l];
 }
 
+
+
+function getNumber(key) {
+    calculator.setNumber(key);
+    checkScreenWidth();
+}
+
+function getFunc(key) {
+    switch (key) {
+        case 'AC':
+            checkOperatorActive()
+            calculator.reset();
+            checkScreenWidth();
+            break;
+        case '.':
+            calculator.addDecimal()
+            break;
+    }
+}
+
+function getOperate() {
+    checkOperatorActive()
+    
+    if (this.textContent === '=') {
+        calculator();
+        checkScreenWidth();
+        return
+    }
+
+    this.classList.add('active');
+    calculator.setOperator(this.textContent);
+    checkScreenWidth();
+}
+
 function changeButtonBGC(e) {
     if (e.type === 'mouseup') {
         this.removeAttribute('style');
@@ -196,13 +128,99 @@ function changeButtonBGC(e) {
     this.style['background-color'] = newColor;
 }
 
+
+function calc() {
+    const display = document.querySelector('.result');
+
+    let a = 0;
+    let op = '';
+    let b = 0;
+
+    const methods = {
+        "-": (a, b) => a - b,
+        "+": (a, b) => a + b,
+        "x": (a, b) => a * b,
+        "÷": (a, b) => a / b,
+    }
+
+    function calculate() {
+        if (b === '') {
+            return;
+        }
+
+        let result = null;
+
+        if (op === "÷" && b === '0') {
+            result = '不是數字'
+        } else {
+            result = methods[op](+a, +b)
+            a = result;
+        }
+        b = '';
+        
+        display.textContent = result;
+        return;
+    }
+
+    calculate.setNumber = (n) => {
+        if (op) {
+            b += n
+            display.textContent = b;
+            console.log(a, op, b)
+            return 
+        }
+        if (!a) {
+            a = n
+
+        } else {
+        a += n
+
+        }
+        display.textContent = a;
+    }
+
+    calculate.setOperator = (item) => {
+        if (op) {
+            calculate();
+        };
+        op = item
+        console.log(a, op, b)
+    }
+
+    // calculate.addDecimal = () => {
+    //     if (a === '' && b === '') {
+    //         return;
+    //     }
+
+    //     if (op && !b.includes('.')) {
+    //         b += '.'
+    //         display.textContent = b;
+    //         return 
+    //     } 
+    //     if (!a.includes('.')) {
+    //         a += '.'
+    //         display.textContent = a;
+    //         return 
+    //     } 
+    // }
+
+    calculate.reset = () => {
+        display.textContent = '0';
+        a = '';
+        op = '';
+        b = '';
+    }
+    
+    return calculate
+}
+
 function getButtons() {
-    const menuButtons = [...document.querySelectorAll('.menu button')];
-    const operatorButtons = [...document.querySelectorAll('.operator button')];
+    const menuButtons = [...document.querySelectorAll('.menu button')]; // 計算機左邊的所有按鈕 (數字與功能)
+    const operatorButtons = [...document.querySelectorAll('.operator button')];// 計算機右邊的所有按鈕 (運算符)
 
     for (let button of menuButtons) {
         button.addEventListener('click', function () {
-            isFinite(this.textContent) ? getNumber(+this.textContent) : getFunc(this.textContent)
+            isFinite(this.textContent) ? getNumber(this.textContent) : getFunc(this.textContent)
         });
     }
 
