@@ -29,14 +29,13 @@ function checkScreenWidth() {
 }
 
 function checkOperatorActive() {
-        const isOperatorActive = document.querySelector('.active');
-        if (isOperatorActive) {
-            isOperatorActive.classList.remove('active');
-        }
+    const isOperatorActive = document.querySelector('.active');
+    if (isOperatorActive) {
+        isOperatorActive.classList.remove('active');
+    }
 }
 
 function rgbToHsl(rgb){
-
     let [r, g, b] = rgb.map(color => color / 255);
 
     const max = Math.max(r, g, b);
@@ -74,7 +73,6 @@ function rgbToHsl(rgb){
 }
 
 
-
 function getNumber(key) {
     calculator.setNumber(key);
     checkScreenWidth();
@@ -88,7 +86,7 @@ function getFunc(key) {
             checkScreenWidth();
             break;
         case '.':
-            calculator.addDecimal()
+            calculator.setDecimal()
             break;
     }
 }
@@ -132,17 +130,17 @@ function changeButtonBGC(e) {
 function calc() {
     const display = document.querySelector('.result');
 
-    let a = 0;
+    let a = '';
     let op = '';
-    let b = 0;
+    let b = '';
 
     const methods = {
-        "-": (a, b) => a - b,
-        "+": (a, b) => a + b,
+        "-": (a, b) => (a * 10 - b * 10) / 10,
+        "+": (a, b) => (a * 10 + b * 10) / 10,
         "x": (a, b) => a * b,
         "÷": (a, b) => a / b,
     }
-
+    // 乘法與除法的精確小數點
     function calculate() {
         if (b === '') {
             return;
@@ -159,22 +157,19 @@ function calc() {
         b = '';
         
         display.textContent = result;
-        return;
     }
 
     calculate.setNumber = (n) => {
-        if (op) {
+        if (op) {   // a 與 op 都選擇後改為顯示 b
             b += n
             display.textContent = b;
-            console.log(a, op, b)
             return 
         }
-        if (!a) {
+
+        if (!a || a === '0') {   // 第一次取代 0
             a = n
-
         } else {
-        a += n
-
+            a += n
         }
         display.textContent = a;
     }
@@ -182,27 +177,26 @@ function calc() {
     calculate.setOperator = (item) => {
         if (op) {
             calculate();
-        };
+        }
         op = item
-        console.log(a, op, b)
     }
 
-    // calculate.addDecimal = () => {
-    //     if (a === '' && b === '') {
-    //         return;
-    //     }
+    calculate.setDecimal = () => {
 
-    //     if (op && !b.includes('.')) {
-    //         b += '.'
-    //         display.textContent = b;
-    //         return 
-    //     } 
-    //     if (!a.includes('.')) {
-    //         a += '.'
-    //         display.textContent = a;
-    //         return 
-    //     } 
-    // }
+        if (op) {
+
+            if (b && b % 1 === 0 && (b + '').at(-1) !== '.') {
+                b += '.'
+                display.textContent = b;
+                return
+            }
+        }
+
+        if (a && a % 1 === 0 && (a + '').at(-1) !== '.') {
+                a += '.'
+                display.textContent = a;
+            }
+    }
 
     calculate.reset = () => {
         display.textContent = '0';
@@ -210,7 +204,11 @@ function calc() {
         op = '';
         b = '';
     }
-    
+    // 只有 a 的時候按等於沒作用
+    // 只有 a 和 op 的時候按等於沒作用
+    // 有 a, op, b 的時候按等於可以計算, 計算完畢後 b 清空
+    // 有 a, 並且 op 是除, b 是 0 的時候, 會警告不是數字
+    // 有 a op, b 的時候按下運算符可以計算, 計算完畢後 b 清空, 可以連續使用運算符計算
     return calculate
 }
 
