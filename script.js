@@ -17,8 +17,9 @@ function checkScreenWidth() {
         const currentFontSize = parseInt(window.getComputedStyle(display)['font-size']);
 
         if (currentFontSize === fontSize) { 
-            calculator.reset();
             alert('The number is too large, the calculator will reset!')
+            calculator.reset();
+            display.style['font-size'] = `${ fontSize * 5 }px`;
         } else {
             display.style['font-size'] = `${currentFontSize - fontSize}px`
         }
@@ -72,36 +73,39 @@ function rgbToHsl(rgb){
     return [h, s, l];
 }
 
-
-function getNumber(key) {
-    calculator.setNumber(key);
+function appendNumber() {
+    console.log()
+    switch (this.textContent) {
+        case '.':
+            calculator.setDecimal()
+            break
+        default:
+            calculator.setNumber(this.textContent);
+    }
     checkScreenWidth();
 }
 
-function getFunc(key) {
-    switch (key) {
+function chooseFunc() {
+    switch (this.textContent) {
         case 'AC':
             checkOperatorActive()
             calculator.reset();
-            checkScreenWidth();
-            break;
-        case '.':
-            calculator.setDecimal()
             break;
     }
+    checkScreenWidth();
 }
 
-function getOperate() {
+function chooseOperate() {
     checkOperatorActive()
-    
-    if (this.textContent === '=') {
-        calculator();
-        checkScreenWidth();
-        return
+    switch (this.textContent) {
+        case '=':
+            calculator();
+            break;
+        default:
+            this.classList.add('active');
+            calculator.setOperator(this.textContent);
     }
 
-    this.classList.add('active');
-    calculator.setOperator(this.textContent);
     checkScreenWidth();
 }
 
@@ -126,7 +130,6 @@ function changeButtonBGC(e) {
     this.style['background-color'] = newColor;
 }
 
-
 function calc() {
     const display = document.querySelector('.result');
 
@@ -135,12 +138,11 @@ function calc() {
     let b = '';
 
     const methods = {
-        "-": (a, b) => (a * 10 - b * 10) / 10,
-        "+": (a, b) => (a * 10 + b * 10) / 10,
+        "-": (a, b) => a - b,
+        "+": (a, b) => a + b,
         "x": (a, b) => a * b,
         "÷": (a, b) => a / b,
     }
-    // 乘法與除法的精確小數點
     function calculate() {
         if (b === '') {
             return;
@@ -151,7 +153,7 @@ function calc() {
         if (op === "÷" && b === '0') {
             result = '不是數字'
         } else {
-            result = methods[op](+a, +b)
+            result = +methods[op](+a, +b).toFixed(15)
             a = result;
         }
         b = '';
@@ -182,17 +184,19 @@ function calc() {
     }
 
     calculate.setDecimal = () => {
-
         if (op) {
-
-            if (b && b % 1 === 0 && (b + '').at(-1) !== '.') {
+            if (b &&
+                b % 1 === 0 &&
+                (b + '').at(-1) !== '.') {
                 b += '.'
                 display.textContent = b;
                 return
             }
         }
 
-        if (a && a % 1 === 0 && (a + '').at(-1) !== '.') {
+        if (a &&
+            a % 1 === 0 &&
+            (a + '').at(-1) !== '.') {
                 a += '.'
                 display.textContent = a;
             }
@@ -213,22 +217,53 @@ function calc() {
 }
 
 function getButtons() {
-    const menuButtons = [...document.querySelectorAll('.menu button')]; // 計算機左邊的所有按鈕 (數字與功能)
-    const operatorButtons = [...document.querySelectorAll('.operator button')];// 計算機右邊的所有按鈕 (運算符)
+    const buttons = [...document.querySelectorAll('.buttons button')];
 
-    for (let button of menuButtons) {
-        button.addEventListener('click', function () {
-            isFinite(this.textContent) ? getNumber(this.textContent) : getFunc(this.textContent)
-        });
-    }
+    for (let button of buttons) {
+        const parentClass = button.parentNode.classList[0];
+        switch (parentClass) {
+            case 'func':
+                button.addEventListener('click', chooseFunc);
+                break;
+            case 'operator':
+                button.addEventListener('click', chooseOperate);
+                break;
+            default:
+                button.addEventListener('click', appendNumber);
+        }
 
-    for (let button of operatorButtons) {
-        button.addEventListener('click', getOperate);
-    }
-
-    for (let button of [...menuButtons, ...operatorButtons]) {
         ['mousedown', 'mouseup'].forEach(event => button.addEventListener(event, changeButtonBGC))
     }
+
+    // document.addEventListener('keydown', (e) => {
+    //     let key = null
+
+    //     switch (e.key) {
+    //         case 'Enter': 
+    //             key = buttons.find(btn => btn.textContent === '=')
+    //             document.activeElement.blur();
+    //             chooseOperate.call(key)
+    //             break
+    //         case 'Escape': 
+    //             key = buttons.find(btn => btn.textContent === 'AC')
+    //             chooseFunc.call(key)   
+    //             break
+    //     }
+
+    //     key = buttons.find(btn => btn.dataset.key === e.key || btn.textContent === e.key)
+    //     if (!key) return
+
+    //     const parentClass = key.parentNode.classList[0];
+    //     switch (parentClass) {
+    //         case 'operator':
+    //             chooseOperate.call(key)
+    //             break;
+    //         default:
+    //             appendNumber.call(key)
+    //     }
+    //             changeButtonBGC.call(key, e)
+
+    // });
 }
 
 const calculator = calc();
