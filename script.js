@@ -235,35 +235,33 @@ function getButtons() {
         ['mousedown', 'mouseup'].forEach(event => button.addEventListener(event, changeButtonBGC))
     }
 
-    // document.addEventListener('keydown', (e) => {
-    //     let key = null
+    document.addEventListener('keydown', (e) => {
+        let key = null
 
-    //     switch (e.key) {
-    //         case 'Enter': 
-    //             key = buttons.find(btn => btn.textContent === '=')
-    //             document.activeElement.blur();
-    //             chooseOperate.call(key)
-    //             break
-    //         case 'Escape': 
-    //             key = buttons.find(btn => btn.textContent === 'AC')
-    //             chooseFunc.call(key)   
-    //             break
-    //     }
+        switch (e.key) {
+            case 'Enter': 
+                key = buttons.find(btn => btn.textContent === '=')
+                document.activeElement.blur();
+                chooseOperate.call(key)
+                return
+            case 'Escape': 
+                key = buttons.find(btn => btn.textContent === 'AC')
+                chooseFunc.call(key)   
+                return
+        }
 
-    //     key = buttons.find(btn => btn.dataset.key === e.key || btn.textContent === e.key)
-    //     if (!key) return
+        key = buttons.find(btn => btn.dataset.key === e.key || btn.textContent === e.key)
+        if (!key) return
 
-    //     const parentClass = key.parentNode.classList[0];
-    //     switch (parentClass) {
-    //         case 'operator':
-    //             chooseOperate.call(key)
-    //             break;
-    //         default:
-    //             appendNumber.call(key)
-    //     }
-    //             changeButtonBGC.call(key, e)
-
-    // });
+        const parentClass = key.parentNode.classList[0];
+        switch (parentClass) {
+            case 'operator':
+                chooseOperate.call(key)
+                break;
+            default:
+                appendNumber.call(key)
+        }
+    });
 }
 
 const calculator = calc();
