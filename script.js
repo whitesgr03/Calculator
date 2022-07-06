@@ -236,7 +236,7 @@ function getButtons() {
 
     document.addEventListener('keydown', (e) => {
         let key = null
-
+        
         switch (e.key) {
             case 'Enter': 
                 key = buttons.find(btn => btn.textContent === '=')
@@ -244,6 +244,7 @@ function getButtons() {
                 chooseOperate.call(key)
                 return
             case 'Escape': 
+            case 'Backspace': 
                 key = buttons.find(btn => btn.textContent === 'AC')
                 chooseFunc.call(key)   
                 return
