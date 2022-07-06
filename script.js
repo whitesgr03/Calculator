@@ -74,7 +74,7 @@ function rgbToHsl(rgb){
 }
 
 function appendNumber() {
-    console.log()
+    changeButtonBGC(this)
     switch (this.textContent) {
         case '.':
             calculator.setDecimal()
@@ -86,6 +86,7 @@ function appendNumber() {
 }
 
 function chooseFunc() {
+    changeButtonBGC(this);
     switch (this.textContent) {
         case 'AC':
             checkOperatorActive()
@@ -97,6 +98,7 @@ function chooseFunc() {
 
 function chooseOperate() {
     checkOperatorActive()
+    changeButtonBGC(this);
     switch (this.textContent) {
         case '=':
             calculator();
@@ -109,17 +111,12 @@ function chooseOperate() {
     checkScreenWidth();
 }
 
-function changeButtonBGC(e) {
-    if (e.type === 'mouseup') {
-        this.removeAttribute('style');
-        return
-    }
-
-    const rgb = window.getComputedStyle(this)['background-color'];
+function changeButtonBGC(button) {
+    const rgb = window.getComputedStyle(button)['background-color'];
     const rgbCode = rgb.match(/\d+/g, "");
     let [Hue, Saturation, Lightness] = rgbToHsl(rgbCode);
 
-    if (this.parentNode.classList.contains('operator')) {
+    if (button.parentNode.classList.contains('operator')) {
         Lightness -= 15;
     } else {
         Lightness += 15
@@ -127,7 +124,7 @@ function changeButtonBGC(e) {
 
     const newColor = `hsl(${Hue}, ${Saturation}%, ${Lightness}%)`;
 
-    this.style['background-color'] = newColor;
+    button.style['background-color'] = newColor;
 }
 
 function calc() {
@@ -232,7 +229,9 @@ function getButtons() {
                 button.addEventListener('click', appendNumber);
         }
 
-        ['mousedown', 'mouseup'].forEach(event => button.addEventListener(event, changeButtonBGC))
+        button.addEventListener('transitionend', function () {
+            this.removeAttribute('style');
+        })
     }
 
     document.addEventListener('keydown', (e) => {
