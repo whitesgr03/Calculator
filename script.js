@@ -4,6 +4,18 @@ const calculator = calc();  // 建立一個常數儲存閉包函式
 
 getButtons();  // 監聽所有按鈕
 
+function getButtons() {
+    const buttons = [...document.querySelectorAll('.buttons button')]; //建立一個常數取得所有按鈕元素
+
+    for (let button of buttons) {
+        button.addEventListener('click', calculator)
+        button.addEventListener('transitionend', function () {
+            this.removeAttribute('style');
+        })
+    }
+    document.addEventListener('keydown', calculator)
+}
+
 function checkScreenWidth() {
     const display = document.querySelector('.result');
     const screen = document.querySelector('.screen');
@@ -217,55 +229,4 @@ function calc() {
     // 有 a, 並且 op 是除, b 是 0 的時候, 會警告不是數字
     // 有 a op, b 的時候按下運算符可以計算, 計算完畢後 b 清空, 可以連續使用運算符計算
     return calculate
-}
-
-function getButtons() {
-    const buttons = [...document.querySelectorAll('.buttons button')];
-
-    for (let button of buttons) {
-        const parentClass = button.parentNode.classList[0];
-        switch (parentClass) {
-            case 'func':
-                button.addEventListener('click', chooseFunc);
-                break;
-            case 'operator':
-                button.addEventListener('click', chooseOperate);
-                break;
-            default:
-                button.addEventListener('click', appendNumber);
-        }
-
-        button.addEventListener('transitionend', function () {
-            this.removeAttribute('style');
-        })
-    }
-
-    document.addEventListener('keydown', (e) => {
-        let key = null
-        
-        switch (e.key) {
-            case 'Enter': 
-                key = buttons.find(btn => btn.textContent === '=')
-                document.activeElement.blur();
-                chooseOperate.call(key)
-                return
-            case 'Escape': 
-            case 'Backspace': 
-                key = buttons.find(btn => btn.textContent === 'AC')
-                chooseFunc.call(key)   
-                return
-        }
-
-        key = buttons.find(btn => btn.dataset.key === e.key || btn.textContent === e.key)
-        if (!key) return
-
-        const parentClass = key.parentNode.classList[0];
-        switch (parentClass) {
-            case 'operator':
-                chooseOperate.call(key)
-                break;
-            default:
-                appendNumber.call(key)
-        }
-    });
 }
