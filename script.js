@@ -4,6 +4,18 @@ const calculator = calc();  // 建立一個常數儲存閉包函式
 
 getButtons();  // 監聽所有按鈕
 
+function getButtons() {
+    const buttons = [...document.querySelectorAll('.buttons button')]; //建立一個常數取得所有按鈕元素
+
+    for (let button of buttons) {
+        button.addEventListener('click', calculator)
+        button.addEventListener('transitionend', function () {
+            this.removeAttribute('style');
+        })
+    }
+    document.addEventListener('keydown', calculator)
+}
+
 function calc() {
     const displayResult = document.querySelector('.result'); // 建立一個常數取得結果輸出的元素
 
