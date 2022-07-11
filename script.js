@@ -127,42 +127,20 @@ function calc() {
     return fn
 }
 
-function checkScreenWidth() {
-    const display = document.querySelector('.result');
-    const screen = document.querySelector('.screen');
-    const [paddingRight, paddingLeft] = [ // screen padding
-        parseInt(window.getComputedStyle(screen)['padding-right']),
-        parseInt(window.getComputedStyle(screen)['padding-left'])
-    ];
-    const fontSize = 16
+function changeButtonBGC(button) {
+    const rgb = window.getComputedStyle(button)['background-color']; // 建立一個常數獲取按鈕元素的 rgb
+    const rgbCode = rgb.match(/\d+/g, "");  // 建立一個元素來獲取 rgb 的 3 數值
+    let [Hue, Saturation, Lightness] = rgbToHsl(rgbCode); // 建立三個元素來獲取 HSL 
 
-    display.style['opacity'] = 0;
-    display.style['font-size'] = `${ fontSize * 5 }px`;
-
-    // 數字是否超過父元素寬度
-    let isOverWidth = display.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)
-    
-    while (isOverWidth) {
-        const currentFontSize = parseInt(window.getComputedStyle(display)['font-size']);
-
-        if (currentFontSize === fontSize) { 
-            alert('The number is too large, the calculator will reset!')
-            calculator.reset();
-            display.style['font-size'] = `${ fontSize * 5 }px`;
-        } else {
-            display.style['font-size'] = `${currentFontSize - fontSize}px`
-        }
-
-        isOverWidth = display.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)
+    if (button.parentNode.classList.contains('operator')) { // 如果是 'operator' class 的話減少亮度, 否則增加亮度
+        Lightness -= 15;
+    } else {
+        Lightness += 15
     }
-    display.style['opacity'] = 1;
-}
 
-function checkOperatorActive() {
-    const isOperatorActive = document.querySelector('.active');
-    if (isOperatorActive) {
-        isOperatorActive.classList.remove('active');
-    }
+    const newColor = `hsl(${Hue}, ${Saturation}%, ${Lightness}%)`; // 建立一個常數來儲存新 HSL
+
+    button.style['background-color'] = newColor; // 給按鈕元素設定新顏色
 }
 
 function rgbToHsl(rgb){
@@ -202,18 +180,40 @@ function rgbToHsl(rgb){
     return [h, s, l];
 }
 
-function changeButtonBGC(button) {
-    const rgb = window.getComputedStyle(button)['background-color'];
-    const rgbCode = rgb.match(/\d+/g, "");
-    let [Hue, Saturation, Lightness] = rgbToHsl(rgbCode);
+function checkScreenWidth() {
+    const display = document.querySelector('.result');
+    const screen = document.querySelector('.screen');
+    const [paddingRight, paddingLeft] = [ // screen padding
+        parseInt(window.getComputedStyle(screen)['padding-right']),
+        parseInt(window.getComputedStyle(screen)['padding-left'])
+    ];
+    const fontSize = 16
 
-    if (button.parentNode.classList.contains('operator')) {
-        Lightness -= 15;
-    } else {
-        Lightness += 15
+    display.style['opacity'] = 0;
+    display.style['font-size'] = `${ fontSize * 5 }px`;
+
+    // 數字是否超過父元素寬度
+    let isOverWidth = display.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)
+    
+    while (isOverWidth) {
+        const currentFontSize = parseInt(window.getComputedStyle(display)['font-size']);
+
+        if (currentFontSize === fontSize) { 
+            alert('The number is too large, the calculator will reset!')
+            calculator.reset();
+            display.style['font-size'] = `${ fontSize * 5 }px`;
+        } else {
+            display.style['font-size'] = `${currentFontSize - fontSize}px`
+        }
+
+        isOverWidth = display.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)
     }
+    display.style['opacity'] = 1;
+}
 
-    const newColor = `hsl(${Hue}, ${Saturation}%, ${Lightness}%)`;
-
-    button.style['background-color'] = newColor;
+function checkOperatorActive() {
+    const isOperatorActive = document.querySelector('.active');
+    if (isOperatorActive) {
+        isOperatorActive.classList.remove('active');
+    }
 }
