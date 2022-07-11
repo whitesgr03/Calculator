@@ -181,39 +181,35 @@ function rgbToHsl(rgb){
 }
 
 function checkScreenWidth() {
-    const display = document.querySelector('.result');
-    const screen = document.querySelector('.screen');
-    const [paddingRight, paddingLeft] = [ // screen padding
+    const displayResult = document.querySelector('.result'); // 建立一個常數來儲存結果元素
+    const screen = document.querySelector('.screen'); // 建立一個常數來儲存螢幕元素
+    const [paddingRight, paddingLeft] = [ // 建立一個常數來儲存螢幕元素的寬度
         parseInt(window.getComputedStyle(screen)['padding-right']),
         parseInt(window.getComputedStyle(screen)['padding-left'])
     ];
-    const fontSize = 16
+    const fontSize = parseInt(window.getComputedStyle(document.body)['font-size']) // 建立一個常數來儲存原始文字大小
 
-    display.style['opacity'] = 0;
-    display.style['font-size'] = `${ fontSize * 5 }px`;
-
-    // 數字是否超過父元素寬度
-    let isOverWidth = display.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)
+    displayResult.style['opacity'] = 0; // 設定結果元素的透明度為 0
+    displayResult.style['font-size'] = `${ fontSize * 5 }px`; // 設定結果元素的文字預設為預設大小
     
-    while (isOverWidth) {
-        const currentFontSize = parseInt(window.getComputedStyle(display)['font-size']);
+    while (displayResult.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)) { // 如果結果元素的寬度超過螢幕元素的寬度的話就執行迴圈
+        const currentFontSize = parseInt(window.getComputedStyle(displayResult)['font-size']); // 建立一個常數來獲取目前結果元素的文字大小
 
-        if (currentFontSize === fontSize) { 
+        if (currentFontSize === fontSize) { // 如果結果元素的文字大小和原始文字大小相等的話, 重置計算機與文字大小, 否則果元素的文字大小剪掉原始文字大小
             alert('The number is too large, the calculator will reset!')
             calculator.reset();
-            display.style['font-size'] = `${ fontSize * 5 }px`;
+            displayResult.style['font-size'] = `${ fontSize * 5 }px`;
         } else {
-            display.style['font-size'] = `${currentFontSize - fontSize}px`
+            displayResult.style['font-size'] = `${currentFontSize - fontSize}px`
         }
-
-        isOverWidth = display.offsetWidth >= screen.offsetWidth - (paddingRight + paddingLeft)
     }
-    display.style['opacity'] = 1;
+    displayResult.style['opacity'] = 1;
 }
 
-function checkOperatorActive() {
-    const isOperatorActive = document.querySelector('.active');
-    if (isOperatorActive) {
+function checkOperatorActive(button) {
+    const isOperatorActive = document.querySelector('.active'); // 建立一個常數來儲存啟用中的運算符按鈕
+    if (isOperatorActive) { // 如果有啟用中的按鈕就將 class 移除, 否則加上 class
         isOperatorActive.classList.remove('active');
     }
+    button.classList.add('active');
 }
