@@ -4,16 +4,127 @@ const calculator = calc();  // 建立一個常數儲存閉包函式
 
 getButtons();  // 監聽所有按鈕
 
-function getButtons() {
-    const buttons = [...document.querySelectorAll('.buttons button')]; //建立一個常數取得所有按鈕元素
+function calc() {
+    const displayResult = document.querySelector('.result'); // 建立一個常數取得結果輸出的元素
 
-    for (let button of buttons) {
-        button.addEventListener('click', calculator)
-        button.addEventListener('transitionend', function () {
-            this.removeAttribute('style');
-        })
+    let a = ''; // 建立一個變數用來儲存第一筆數字
+    let op = ''; // 建立一個變數用來儲存運算符
+    let b = ''; // 建立一個變數用來儲存第二比數字
+
+    const methods = { // 建立一個常數儲存運算式
+        "-": (a, b) => a - b,
+        "+": (a, b) => a + b,
+        "x": (a, b) => a * b,
+        "÷": (a, b) => a / b,
     }
-    document.addEventListener('keydown', calculator)
+
+    function fn(e) {
+        let el = null; // 建立一個變數用來儲存觸發的元素
+        let key = null // 建立一個常數用來儲存事件所傳遞的按鍵
+
+        if (e.type === 'keydown') { // 如果觸發鍵盤事件, 進行 switch 條件判斷, 否則直接獲取 el 和 key
+            switch (e.key) {
+                case 'Escape':
+                case 'Backspace':
+                    el = document.querySelector(`button[data-key="AC"]`)
+                    break;
+                case 'Enter':
+                    el = document.querySelector(`button[data-key="="]`)
+                    break;
+                default:
+                el = document.querySelector(`button[data-key="${e.key}"]`)
+            }
+            if (!el) return  // 如果 el 是 null 的話終止函式
+            key = el.textContent;
+        } else {
+            el = this;
+            key = this.textContent
+        }
+
+        if (isFinite(key)) { // 如果事件傳遞的按鍵是整數字串的話, 則輸入數字到運算式中
+            fn.setNumber(key);
+        } else { // 否則進行 switch 條件判斷
+            switch (key) {
+                case '.':
+                    fn.setDecimal()
+                    break
+                case 'AC':
+                    fn.reset();
+                    break;
+                case '=':
+                    fn.getResult();
+                    break;
+                default:
+                    checkOperatorActive(el)
+                    fn.setOperator(key);
+            }
+        }
+        changeButtonBGC(el) // 執行按鈕背景顏色切換
+        checkScreenWidth(); // 檢查數字是否超出元素的最大寬度
+    }
+
+    fn.getResult = () => { // 計算結果
+        if (b === '') {
+            return;
+        }
+
+        let result = null; // 建立一個變數來儲存結果
+
+        if (op === "÷" && b === '0') { // 如果除以 0 的話顯示文字
+            result = '不是數字'
+        } else {
+            result = +methods[op](+a, +b).toFixed(14)
+            a = result;
+        }
+        b = '';
+        
+        displayResult.textContent = result;
+    }
+    fn.setNumber = (n) => { // 輸入數字
+        if (op) {   // a 與 op 都選擇後改為顯示 b
+            b += n
+            displayResult.textContent = b;
+            return
+        }
+
+        if (!a || a === '0') {   // 第一次輸入時取代 0
+            a = n
+        } else {
+            a += n
+        }
+        displayResult.textContent = a;
+    }
+    fn.setOperator = (item) => { // 設定運算符
+        if (op) {
+            fn.getResult();
+        }
+        op = item
+    }
+    fn.setDecimal = () => { // 設定小數點
+        if (op) {
+            if (b &&
+                b % 1 === 0 &&
+                (b + '').at(-1) !== '.') {
+                b += '.'
+                displayResult.textContent = b;
+                return
+            }
+        }
+
+        if (a &&
+            a % 1 === 0 &&
+            (a + '').at(-1) !== '.') {
+                a += '.'
+                displayResult.textContent = a;
+            }
+    }
+    fn.reset = () => { // 重置全部
+        displayResult.textContent = '0';
+        a = '';
+        op = '';
+        b = '';
+    }
+    return fn
 }
 
 function checkScreenWidth() {
@@ -91,44 +202,6 @@ function rgbToHsl(rgb){
     return [h, s, l];
 }
 
-function appendNumber() {
-    changeButtonBGC(this)
-    switch (this.textContent) {
-        case '.':
-            calculator.setDecimal()
-            break
-        default:
-            calculator.setNumber(this.textContent);
-    }
-    checkScreenWidth();
-}
-
-function chooseFunc() {
-    changeButtonBGC(this);
-    switch (this.textContent) {
-        case 'AC':
-            checkOperatorActive()
-            calculator.reset();
-            break;
-    }
-    checkScreenWidth();
-}
-
-function chooseOperate() {
-    checkOperatorActive()
-    changeButtonBGC(this);
-    switch (this.textContent) {
-        case '=':
-            calculator();
-            break;
-        default:
-            this.classList.add('active');
-            calculator.setOperator(this.textContent);
-    }
-
-    checkScreenWidth();
-}
-
 function changeButtonBGC(button) {
     const rgb = window.getComputedStyle(button)['background-color'];
     const rgbCode = rgb.match(/\d+/g, "");
@@ -143,90 +216,4 @@ function changeButtonBGC(button) {
     const newColor = `hsl(${Hue}, ${Saturation}%, ${Lightness}%)`;
 
     button.style['background-color'] = newColor;
-}
-
-function calc() {
-    const display = document.querySelector('.result');
-
-    let a = '';
-    let op = '';
-    let b = '';
-
-    const methods = {
-        "-": (a, b) => a - b,
-        "+": (a, b) => a + b,
-        "x": (a, b) => a * b,
-        "÷": (a, b) => a / b,
-    }
-    function calculate() {
-        if (b === '') {
-            return;
-        }
-
-        let result = null;
-
-        if (op === "÷" && b === '0') {
-            result = '不是數字'
-        } else {
-            result = +methods[op](+a, +b).toFixed(15)
-            a = result;
-        }
-        b = '';
-        
-        display.textContent = result;
-    }
-
-    calculate.setNumber = (n) => {
-        if (op) {   // a 與 op 都選擇後改為顯示 b
-            b += n
-            display.textContent = b;
-            return 
-        }
-
-        if (!a || a === '0') {   // 第一次取代 0
-            a = n
-        } else {
-            a += n
-        }
-        display.textContent = a;
-    }
-
-    calculate.setOperator = (item) => {
-        if (op) {
-            calculate();
-        }
-        op = item
-    }
-
-    calculate.setDecimal = () => {
-        if (op) {
-            if (b &&
-                b % 1 === 0 &&
-                (b + '').at(-1) !== '.') {
-                b += '.'
-                display.textContent = b;
-                return
-            }
-        }
-
-        if (a &&
-            a % 1 === 0 &&
-            (a + '').at(-1) !== '.') {
-                a += '.'
-                display.textContent = a;
-            }
-    }
-
-    calculate.reset = () => {
-        display.textContent = '0';
-        a = '';
-        op = '';
-        b = '';
-    }
-    // 只有 a 的時候按等於沒作用
-    // 只有 a 和 op 的時候按等於沒作用
-    // 有 a, op, b 的時候按等於可以計算, 計算完畢後 b 清空
-    // 有 a, 並且 op 是除, b 是 0 的時候, 會警告不是數字
-    // 有 a op, b 的時候按下運算符可以計算, 計算完畢後 b 清空, 可以連續使用運算符計算
-    return calculate
 }
