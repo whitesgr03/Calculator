@@ -1,3 +1,5 @@
+'use strict'
+
 function checkScreenWidth() {
     const display = document.querySelector('.result');
     const screen = document.querySelector('.screen');
