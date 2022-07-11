@@ -1,5 +1,9 @@
 'use strict'
 
+const calculator = calc();  // 建立一個常數儲存閉包函式
+
+getButtons();  // 監聽所有按鈕
+
 function checkScreenWidth() {
     const display = document.querySelector('.result');
     const screen = document.querySelector('.screen');
@@ -265,7 +269,3 @@ function getButtons() {
         }
     });
 }
-
-const calculator = calc();
-
-getButtons();
