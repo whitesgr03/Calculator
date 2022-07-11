@@ -82,7 +82,7 @@ function calc() {
 
         let result = null; // 建立一個變數來儲存結果
 
-        if (op === "÷" && b === '0') { // 如果除以 0 的話顯示文字
+        if (op === "÷" && b === '0' || b === '0.') { // 如果除以 0 的話顯示文字
             result = '不是數字'
         } else {
             result = +methods[op](+a, +b).toFixed(14)
