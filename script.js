@@ -119,8 +119,8 @@ function calc() {
                 (b + '').at(-1) !== '.') {
                 b += '.'
                 displayResult.textContent = b;
-                return
             }
+            return
         }
 
         if (a &&
